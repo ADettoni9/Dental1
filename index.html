@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio Dental — Gestión de Cuentas</title>
+  <meta name="description" content="Sistema de gestión de clientes y cuentas corrientes para laboratorio de mecánica dental." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ====== LOGIN SCREEN ====== -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg class="login-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2C8 2 6 5 6 8c0 2 1 3.5 2 4.5L7 22h10l-1-9.5c1-1 2-2.5 2-4.5 0-3-2-6-6-6z"/>
+          <path d="M9 14h6" stroke-linecap="round"/>
+        </svg>
+        <h1 class="login-title">DentalLab</h1>
+        <p class="login-subtitle">Gestión de Cuentas Corrientes</p>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="login-user">👤 Usuario</label>
+          <input type="text" id="login-user" placeholder="Escribí tu usuario aquí" required />
+        </div>
+        <div class="form-group">
+          <label for="login-pass">🔒 Contraseña</label>
+          <div class="password-wrapper">
+            <input type="password" id="login-pass" placeholder="Escribí tu contraseña aquí" required />
+            <button type="button" class="toggle-password" id="toggle-password" aria-label="Mostrar contraseña">
+              <svg id="eye-open" class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg id="eye-closed" class="eye-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p id="login-error" class="login-error"></p>
+        <button type="submit" class="btn btn-primary login-btn">
+          ➡️ Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== APP CONTAINER (hidden until login) ====== -->
+  <div id="app-container" class="app-container hidden">
+
+    <!-- ====== TOP BAR ====== -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2C8 2 6 5 6 8c0 2 1 3.5 2 4.5L7 22h10l-1-9.5c1-1 2-2.5 2-4.5 0-3-2-6-6-6z"/>
+          <path d="M9 14h6" stroke-linecap="round"/>
+        </svg>
+        <span class="topbar-title">DentalLab</span>
+      </div>
+      <button class="btn btn-logout" id="btn-logout">
+        🚪 Salir
+      </button>
+    </header>
+
+    <!-- ====== TAB NAVIGATION ====== -->
+    <nav class="tab-nav" id="tab-nav">
+      <button class="tab active" data-section="dashboard" id="tab-dashboard">
+        📊 Resumen
+      </button>
+      <button class="tab" data-section="ficha" id="tab-ficha">
+        📝 Cargar Trabajo
+      </button>
+      <button class="tab" data-section="precios" id="tab-precios">
+        💲 Precios
+      </button>
+      <button class="tab" data-section="doctores" id="tab-doctores">
+        👨‍⚕️ Doctores
+      </button>
+    </nav>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="main-content">
+
+      <!-- ============ SECTION: DASHBOARD ============ -->
+      <section id="section-dashboard" class="section active">
+        <h1 class="page-title">📊 Resumen de Cuentas</h1>
+        <p class="page-help">Acá ves cuánto debe cada doctor y cuánto pagó</p>
+
+        <!-- KPI Cards -->
+        <div class="kpi-row" id="kpi-row">
+          <div class="kpi-card kpi-card--doctors">
+            <span class="kpi-emoji">👨‍⚕️</span>
+            <span class="kpi-value" id="kpi-doctors">0</span>
+            <span class="kpi-label">Doctores</span>
+          </div>
+          <div class="kpi-card kpi-card--debe">
+            <span class="kpi-emoji">📤</span>
+            <span class="kpi-value" id="kpi-debe">$0</span>
+            <span class="kpi-label">Total que deben</span>
+          </div>
+          <div class="kpi-card kpi-card--haber">
+            <span class="kpi-emoji">📥</span>
+            <span class="kpi-value" id="kpi-haber">$0</span>
+            <span class="kpi-label">Total que pagaron</span>
+          </div>
+          <div class="kpi-card kpi-card--saldo">
+            <span class="kpi-emoji">💰</span>
+            <span class="kpi-value" id="kpi-saldo">$0</span>
+            <span class="kpi-label">Saldo pendiente</span>
+          </div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Cuenta de cada Doctor</h2>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" id="table-resumen">
+              <thead>
+                <tr>
+                  <th>Doctor</th>
+                  <th class="text-right">Debe</th>
+                  <th class="text-right">Pagó</th>
+                  <th class="text-right">Saldo</th>
+                  <th class="text-center">Ver más</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-resumen">
+                <tr><td colspan="5" class="empty-state">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION: FICHA DE CARGA ============ -->
+      <section id="section-ficha" class="section">
+        <h1 class="page-title">📝 Cargar Trabajo o Pago</h1>
+        <p class="page-help">Completá los datos y apretá "Guardar"</p>
+
+        <div class="card form-card">
+          <form id="form-movimiento" autocomplete="off">
+            <div class="form-stack">
+
+              <!-- Tipo -->
+              <div class="form-group">
+                <label for="mov-tipo">¿Qué vas a registrar?</label>
+                <div class="radio-group">
+                  <label class="radio-option radio-option--trabajo selected" id="radio-trabajo">
+                    <input type="radio" name="mov-tipo" value="trabajo" checked />
+                    <span class="radio-box">🔧</span>
+                    <span>Un trabajo que hice</span>
+                  </label>
+                  <label class="radio-option radio-option--pago" id="radio-pago">
+                    <input type="radio" name="mov-tipo" value="pago" />
+                    <span class="radio-box">💵</span>
+                    <span>Un pago del doctor</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Fecha -->
+              <div class="form-group">
+                <label for="mov-fecha">📅 Fecha</label>
+                <input type="date" id="mov-fecha" required />
+              </div>
+
+              <!-- Doctor -->
+              <div class="form-group">
+                <label for="mov-doctor">👨‍⚕️ ¿De qué doctor?</label>
+                <select id="mov-doctor" required>
+                  <option value="">— Elegí un doctor —</option>
+                </select>
+              </div>
+
+              <!-- Trabajo (solo para tipo trabajo) -->
+              <div class="form-group" id="group-trabajo">
+                <label for="mov-trabajo">🦷 ¿Qué trabajo hiciste?</label>
+                <select id="mov-trabajo">
+                  <option value="">— Elegí el trabajo —</option>
+                </select>
+                <span class="form-hint">Al elegir el trabajo, el precio se completa solo</span>
+              </div>
+
+              <!-- Concepto pago (solo para tipo pago) -->
+              <div class="form-group hidden" id="group-concepto-pago">
+                <label for="mov-concepto-pago">📝 Detalle del pago</label>
+                <input type="text" id="mov-concepto-pago" placeholder="Ej: Pago en efectivo, Transferencia..." />
+              </div>
+
+              <!-- Debe -->
+              <div class="form-group" id="group-debe">
+                <label for="mov-debe">💲 Costo del trabajo ($)</label>
+                <input type="number" id="mov-debe" min="0" step="0.01" value="0" />
+              </div>
+
+              <!-- Haber -->
+              <div class="form-group hidden" id="group-haber">
+                <label for="mov-haber">💲 Monto que pagó ($)</label>
+                <input type="number" id="mov-haber" min="0" step="0.01" value="0" />
+              </div>
+
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="btn-guardar-mov">
+                ✅ Guardar
+              </button>
+              <button type="reset" class="btn btn-ghost btn-lg" id="btn-reset-mov">
+                🗑️ Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla de movimientos recientes -->
+        <div class="card" style="margin-top:1.5rem">
+          <div class="card-header">
+            <h2>📋 Últimos movimientos cargados</h2>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" id="table-movimientos">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Doctor</th>
+                  <th>Concepto</th>
+                  <th class="text-right">Debe</th>
+                  <th class="text-right">Pagó</th>
+                  <th class="text-center">Borrar</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-movimientos">
+                <tr><td colspan="6" class="empty-state">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION: PRECIOS ============ -->
+      <section id="section-precios" class="section">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">💲 Lista de Precios</h1>
+            <p class="page-help">Acá podés ver y cambiar los precios de tus trabajos</p>
+          </div>
+          <button class="btn btn-primary btn-lg" id="btn-add-precio">
+            ➕ Agregar Precio
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="data-table" id="table-precios">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Trabajo</th>
+                  <th class="text-right">Precio</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-precios">
+                <tr><td colspan="4" class="empty-state">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION: DOCTORES ============ -->
+      <section id="section-doctores" class="section">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">👨‍⚕️ Doctores</h1>
+            <p class="page-help">Acá podés agregar, editar o borrar doctores</p>
+          </div>
+          <button class="btn btn-primary btn-lg" id="btn-add-doctor">
+            ➕ Agregar Doctor
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="data-table" id="table-doctores">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre del Doctor</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-doctores">
+                <tr><td colspan="3" class="empty-state">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ====== MODAL ====== -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Título</h3>
+        <button class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ====== DETAIL MODAL ====== -->
+  <div id="detail-overlay" class="modal-overlay">
+    <div class="modal modal--wide" id="detail-modal">
+      <div class="modal-header">
+        <h3 id="detail-title">Detalle</h3>
+        <button class="modal-close" id="detail-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <!-- ====== TOAST CONTAINER ====== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ====== SCRIPTS ====== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
